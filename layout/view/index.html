@@ -12,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{url_for('static', filename='layout/css/style.css')}}"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         * {
             margin: 0;
@@ -20,8 +21,8 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: "Poppins", sans-serif; 
+            background: #f5f7fa;
             min-height: 100vh;
         }
 
@@ -29,7 +30,7 @@
         .navbar {
             background: white;
             padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -39,7 +40,7 @@
         }
 
         .title-website {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #2c3e50;
             margin-right: 2rem;
@@ -47,7 +48,7 @@
 
         .navbar-nav {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
             align-items: center;
             flex: 1;
             justify-content: center;
@@ -182,7 +183,7 @@
         .tampilan-map {
             background: #f8f9fa;
             border-radius: 15px;
-            padding: 2rem;
+            padding: 1rem;
             text-align: center;
             min-height: 400px;
             display: flex;
@@ -196,6 +197,7 @@
         .map-placeholder {
             color: #6c757d;
             font-size: 1.2rem;
+            width: 800px;
         }
 
         .gambar-peta {
@@ -258,51 +260,122 @@
         .content-wrapper {
             animation: fadeIn 0.6s ease-out;
         }
+        .content-wrapper {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Popup Styles */
+        .popup-login {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1050;
+        }
+        .popup-signup{
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1050;
+        }
+
+        .popup-login-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        #map { width: 100%; height: 600px; border-radius: 12px; }
+        .controls { margin-top: 1rem; display:flex; gap: .5rem; align-items:center; }
+        .coord-form { display: none; margin-top: 0.75rem; }
+        .result-modal {
+        position: fixed; right: 20px; top: 80px; z-index: 9999;
+        background: white; padding: 16px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        min-width: 260px;
+        }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
     <!-- Navbar Section -->
-    <nav class="navbar">
-        <div class="title-website">GeoFarm Project</div>
-        <div class="navbar-nav">
-            <a href="#home" class="nav-link">Beranda</a>
-            <a href="#petunjuk" class="nav-link">Petunjuk Penggunaan</a>
-            <a href="#tentang" class="nav-link">Tentang Kami</a>
-        </div>
-
-        <div class="button-account">
-            <a href="#" class="btn btn-outline">Login</a>
-            <a href="#" class="btn btn-danger">Sign Up</a>
+    <nav class="navbar p-3">
+        <div class="container d-flex align-items-center">
+            <div class="me-3 fw-bold">GeoFarm Project</div>
+                <div class="flex-grow-1 text-center">
+                    <a class="me-3">Beranda</a><a class="me-3">Panduan</a><a>Tentang</a>
+                </div>
+            <div>
+                <button class="btn btn-outline-secondary" id="btn-login">Login</button>
+                <button class="btn btn-danger ms-2" id="btn-signup">Sign Up</button>
+            </div>
         </div>
     </nav>
     <!-- End of Navbar -->
 
     <!-- Main Content -->
-    <section class="landing" id="home">
-        <main class="content" id="main-content">
-            <div class="content-wrapper">
-                <!-- Search Container -->
-                <div class="search-container">
-                    <form class="search-form">
-                        <input class="search-input" type="search" placeholder="Telusuri Lokasi" aria-label="Search Location">
-                        <button class="search-btn" type="button">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </form>
-                </div>
+    <main class="container my-4">
+    <div class="card p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5>Pilih Lokasi Kandang</h5>
+        <div>
+          <button class="btn btn-sm btn-primary" id="btn-pin">Mode Pilih Titik (Pin)</button>
+          <button class="btn btn-sm btn-outline-primary" id="btn-manual">Masukkan Koordinat Manual</button>
+        </div>
+      </div>
 
-                <!-- Map Display -->
-                <div class="tampilan-map">
-                    <div class="map-placeholder">
-                        <i class="bi bi-geo-alt map-icon"></i>
-                        <p>Peta akan ditampilkan di sini</p>
-                        <small class="text-muted">Masukkan lokasi untuk memulai analisis</small>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </section>
+      <div id="map" class="mt-3"></div>
+
+      <div class="controls">
+        <div>
+          <small class="text-muted">Koordinat terpilih:</small>
+          <div id="coord-display">Belum ada</div>
+        </div>
+
+        <div class="ms-auto">
+          <button id="btn-analyze" class="btn btn-success">Lihat Analisa</button>
+        </div>
+      </div>
+
+      <!-- form input manual -->
+      <div class="coord-form" id="coord-form">
+        <div class="row g-2 mt-2">
+          <div class="col-md-5">
+            <input id="input-lat" type="number" step="any" class="form-control" placeholder="Latitude (contoh: -7.55)" />
+          </div>
+          <div class="col-md-5">
+            <input id="input-lon" type="number" step="any" class="form-control" placeholder="Longitude (contoh: 110.52)" />
+          </div>
+          <div class="col-md-2">
+            <button id="btn-set-manual" class="btn btn-primary w-100">Set</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
     <!-- End of Main -->
+
+    <!-- result card (akan diisi oleh JS) -->
+    <div id="result-card" class="result-modal hidden"></div>
 
     <!-- Apa itu GeoFarm Project -->
     <section id="about" class="py-5">
@@ -311,22 +384,37 @@
             <div class="row g-4 justify-content-center">
                 <div class="col-md-5">
                     <div class="p-3 border rounded shadow-sm">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+                        <p>
+                            Sektor peternakan ayam di Indonesia memegang peranan krusial dalam pemenuhan gizi masyarakat dan perekonomian nasional. Namun, penentuan lokasi kandang yang seringkali tidak strategis menimbulkan berbagai masalah serius. 
+                            Peternakan yang terlalu dekat dengan pemukiman dapat menyebabkan pencemaran lingkungan seperti bau tidak sedap dan serangan lalat, yang berisiko menyebarkan penyakit seperti diare dan disentri kepada warga sekitar.
+                            Selain itu, lokasi yang tidak optimal juga berdampak pada peningkatan biaya operasional dan risiko kematian ayam selama transportasi.
+                        </p>
                     </div>
                 </div>
                 <div class="col-md-5">
                     <div class="p-3 border rounded shadow-sm">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+                        <p>
+                            Solusi Inovatif Berbasis Teknologi yang memanfaatka Sistem Informasi Georgrafis (SIG) yang dirancang khusus untuk membantu
+                            para peternak dalam menganalisis dan menentukan lokasi terbaik untuk kandang ayam.
+                            Dengan platform ini, peternak dapat membuat keputusan berdasarkan data yang akurat dan relevan.
+                        </p>
                     </div>
                 </div>
                 <div class="col-md-5">
                     <div class="p-3 border rounded shadow-sm">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+                        <p>
+                            GeoFarm bekerja dengan menganalisis berbagai faktor kunci secara spasial.
+                            Sistem ini mempertimbangkan variabel fisik dan lingkungan yang krusial, seperti jarak ideal dari pemukiman warga, akses terhadap jalan utama, ketersediaan sumber air (sungai), kondisi topografi, hingga kesesuaian penggunaan lahan di sekitarnya.
+                            Dengan mengintegrasikan seluruh data ini, GeoFarm memberikan rekomendasi lokasi yang paling sesuai dan efisien.
+                        </p>
                     </div>
                 </div>
                 <div class="col-md-5">
                     <div class="p-3 border rounded shadow-sm">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+                        <p>
+                            Produk dari sebuah penelitian yang bertujuan untuk mengembangkan website WebGIS untuk memetakan persebaran kandang ayam serta menganalisis kesesuaian lokasinya di Kecamatan Musuk, Kabupatan Boyolali.
+                            Proyek ini dikembangkan menggunakan metode research and development (R&D) dengan pendekatan model ADDIE(Analysis, Design, Development, Implementation, Evaluation)
+                        </p>
                     </div>
                 </div>
             </div>
@@ -340,17 +428,23 @@
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="p-4 border rounded h-100">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+                        <p>
+                            Menentukan titik lokasi
+                        </p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="p-4 border rounded h-100">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+                        <p>
+                            Masukkan atau pilih data koordinat lokasi
+                        </p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="p-4 border rounded h-100">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+                        <p>
+                            Lihat Analisis Hasil
+                        </p>
                     </div>
                 </div>
             </div>
@@ -361,7 +455,9 @@
     <section id="tentang" class="py-5">
         <div class="container">
             <h2 class="text-center mb-4 fw-bold">Tentang Kami</h2>
-            <p class="lead text-center">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce porta est ac ex sollicitudin, vel vestibulum justo interdum...</p>
+            <p class="lead text-center">
+                Tujuan utama dari proyek GeoFarm adalah untuk menyediakan sebuah alat bantu yang mudah diakses bagi para peternak untuk menentukan lokasi kandang yang optimal. Kami percaya bahwa dengan penentuan lokasi yang tepat, produktivitas peternakan dapat meningkat secara signifikan. Di saat yang sama, kami berkomitmen untuk mendukung keberlanjutan lingkungan dengan meminimalkan dampak negatif yang mungkin timbul, seperti pencemaran udara dan risiko kesehatan bagi masyarakat sekitar. GeoFarm hadir untuk menjembatani kebutuhan akan produktivitas usaha peternakan dengan keharusan menjaga kelestarian lingkungan dan kesejahteraan sosial.
+            </p>
         </div>
     </section>
 
@@ -381,9 +477,193 @@
 </body>
 
 </html>
+    <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Inisialisasi map
+    const map = L.map('map').setView([-7.55603, 110.52650], 12);
+
+    // Tile layer (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // load geojson layers (pastikan route /dataset/<file> tersedia)
+    async function loadGeojson(url, style) {
+      try {
+        const r = await fetch(url);
+        if(!r.ok) throw new Error('Gagal memuat ' + url);
+        const gj = await r.json();
+        return L.geoJSON(gj, { style }).addTo(map);
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    loadGeojson('/dataset/iniSungai.geojson', {color: 'blue', weight: 2});
+    loadGeojson('/dataset/iniJalan.geojson', {color: 'red', weight: 2});
+    loadGeojson('/dataset/batasAdministrasiKecMusuk.geojson', {color: 'green', weight: 2, fill:false});
+
+    // state
+    let pinMode = false;
+    let selectedCoord = null;
+    let marker = null;
+    const coordDisplay = document.getElementById('coord-display');
+
+    document.getElementById('btn-pin').addEventListener('click', () => {
+      pinMode = !pinMode;
+      document.getElementById('btn-pin').textContent = pinMode ? 'Klik pada peta untuk memilih titik (aktif)' : 'Mode Pilih Titik (Pin)';
+      if(pinMode) {
+        map.getContainer().style.cursor = 'crosshair';
+      } else {
+        map.getContainer().style.cursor = '';
+      }
+    });
+
+    // klik peta untuk set pin
+    map.on('click', (e) => {
+      if(!pinMode) return;
+      const lat = e.latlng.lat;
+      const lon = e.latlng.lng;
+      setSelectedPoint(lat, lon);
+      // matikan pin mode setelah memilih (opsional)
+      pinMode = false;
+      document.getElementById('btn-pin').textContent = 'Mode Pilih Titik (Pin)';
+      map.getContainer().style.cursor = '';
+    });
+
+    function setSelectedPoint(lat, lon) {
+      selectedCoord = { lat, lon };
+      coordDisplay.textContent = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+      if(marker) map.removeLayer(marker);
+      marker = L.circleMarker([lat, lon], { radius:8, fill:true, color:'#333', weight:1, fillOpacity:0.9 }).addTo(map);
+      marker.bindTooltip("Titik terpilih").openTooltip();
+      // center sedikit
+      map.panTo([lat, lon], { animate:true, duration: 0.6 });
+    }
+
+    // manual coordinate UI
+    document.getElementById('btn-manual').addEventListener('click', () => {
+      const frm = document.getElementById('coord-form');
+      frm.style.display = frm.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.getElementById('btn-set-manual').addEventListener('click', () => {
+      const lat = parseFloat(document.getElementById('input-lat').value);
+      const lon = parseFloat(document.getElementById('input-lon').value);
+      if(isNaN(lat) || isNaN(lon)) {
+        alert('Masukkan koordinat valid!');
+        return;
+      }
+      setSelectedPoint(lat, lon);
+      // scroll ke map
+      window.scrollTo({ top: document.getElementById('map').offsetTop - 20, behavior: 'smooth' });
+    });
+
+    // tombol analyze
+    document.getElementById('btn-analyze').addEventListener('click', async () => {
+      if(!selectedCoord) {
+        alert('Pilih titik terlebih dahulu (pakai mode pin atau masukkan manual).');
+        return;
+      }
+
+      // animasi zoom-in ke lokasi
+      map.flyTo([selectedCoord.lat, selectedCoord.lon], 16, { duration: 1.2 });
+
+      // Kirim data ke backend
+      try {
+        const resp = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(selectedCoord)
+        });
+        const json = await resp.json();
+        if(!resp.ok) {
+          throw new Error(json.error || 'Server error');
+        }
+        showResult(json, selectedCoord);
+      } catch (err) {
+        console.error(err);
+        alert('Terjadi error: ' + err.message);
+      }
+    });
+
+    // tampilkan hasil analisa — card + marker warna
+    function showResult(data, coord) {
+      // buat marker dengan warna sesuai data.warna
+      if(marker) map.removeLayer(marker);
+      const color = data.warna || 'blue';
+      marker = L.circleMarker([coord.lat, coord.lon], {
+        radius: 10, fill: true, fillOpacity: 0.9, color: '#333', weight:1
+      }).addTo(map);
+      marker.setStyle({ fillColor: color });
+
+      // buat popup card
+      const rc = document.getElementById('result-card');
+      rc.innerHTML = `
+        <div>
+          <h6>Hasil Pemeriksaan</h6>
+          <div style="display:flex;align-items:center;gap:.6rem;margin:6px 0;">
+            <div style="width:18px;height:18px;border-radius:4px;background:${color};"></div>
+            <strong>${data.klasifikasi}</strong>
+          </div>
+          <div style="font-size:.9rem;color:#333;margin-bottom:.5rem;">
+            <div><small>${data.penjelasan}</small></div>
+            <div style="margin-top:.5rem;"><small>Jarak ke sungai: ${data.jarak_sungai_m.toFixed(2)} m</small></div>
+            <div><small>Jarak ke jalan: ${data.jarak_jalan_m.toFixed(2)} m</small></div>
+          </div>
+          <div class="d-flex gap-2">
+            <button id="btn-close-result" class="btn btn-sm btn-outline-secondary">Tutup</button>
+            <button id="btn-view-map" class="btn btn-sm btn-primary">Zoom Lagi</button>
+          </div>
+        </div>
+      `;
+      rc.classList.remove('hidden');
+
+      document.getElementById('btn-close-result').addEventListener('click', () => {
+        rc.classList.add('hidden');
+      });
+
+      document.getElementById('btn-view-map').addEventListener('click', () => {
+        map.flyTo([coord.lat, coord.lon], 17, { duration: 1.0 });
+      });
+
+      // buka popup di marker juga
+      marker.bindPopup(`<b>${data.klasifikasi}</b><br>${data.penjelasan}`).openPopup();
+    }
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Bootstrap JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function popupLogin(callback){
+            $.get("/login-user", function(html){
+                $("body").append(html);
+                if(callback) callback();
+            });
+        }
+        function popupSignUp(callback){
+            $.get("/signUp-user", function(html){
+                $("body").append(html);
+                if(callback) callback();
+            });
+        }
+        $(document).ready(function() {
+            $('#user-login').on('click', function(event) {
+                event.preventDefault(); 
+                popupLogin();
+            });
+
+            $('#user-signup').on('click', function(event) {
+                event.preventDefault(); 
+                popupSignUp();
+            });
+        });
+    </script>
     <script>
         // Simple search functionality
         document.querySelector('.search-btn').addEventListener('click', function() {
