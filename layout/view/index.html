@@ -26,9 +26,8 @@
             min-height: 100vh;
         }
 
-        /* Navbar Styles */
         .navbar {
-            background: white;
+            background: linear-gradient(to right,rgb(38, 233, 38), white);
             padding: 1rem 2rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             display: flex;
@@ -313,47 +312,57 @@
         min-width: 260px;
         }
         .hidden { display: none; }
+
+        #about{
+            background: linear-gradient(to bottom,rgb(38, 233, 150), white);
+        }
+
+        #tentang{
+            background: linear-gradient(to bottom,rgb(38, 233, 233), white);
+        }
     </style>
 </head>
 <body>
     <!-- Navbar Section -->
     <nav class="navbar p-3">
         <div class="container d-flex align-items-center">
-            <div class="me-3 fw-bold">GeoFarm Project</div>
-                <div class="flex-grow-1 text-center">
-                    <a class="me-3">Beranda</a><a class="me-3">Panduan</a><a>Tentang</a>
-                </div>
-            <div>
+            <div class="me-3 fw-bold" style="justify-content: left;">GeoFarm Project</div>
+            <div style="display: flex; gap:18px; color:black; font-weight:bold; justify-content:center;">
+                <a href="#main" style="text-decoration: none; color:black">Beranda</a>
+                <a href="#petunjuk" style="text-decoration: none; color:black">Panduan</a>
+                <a href="#about" style="text-decoration: none; color:black">Tentang</a>
+            </div>
+            <!-- <div>
                 <button class="btn btn-outline-secondary" id="btn-login">Login</button>
                 <button class="btn btn-danger ms-2" id="btn-signup">Sign Up</button>
-            </div>
+            </div> -->
         </div>
     </nav>
     <!-- End of Navbar -->
 
     <!-- Main Content -->
-    <main class="container my-4">
-    <div class="card p-3">
-      <div class="d-flex justify-content-between align-items-center">
-        <h5>Pilih Lokasi Kandang</h5>
-        <div>
-          <button class="btn btn-sm btn-primary" id="btn-pin">Mode Pilih Titik (Pin)</button>
-          <button class="btn btn-sm btn-outline-primary" id="btn-manual">Masukkan Koordinat Manual</button>
-        </div>
-      </div>
-
-      <div id="map" class="mt-3"></div>
-
-      <div class="controls">
-        <div>
-          <small class="text-muted">Koordinat terpilih:</small>
-          <div id="coord-display">Belum ada</div>
+    <main class="container my-4" id="main">
+        <div class="card p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5>Pilih Lokasi Kandang</h5>
+            <div>
+                <button class="btn btn-sm btn-primary" id="btn-pin">Mode Pilih Titik (Pin)</button>
+                <button class="btn btn-sm btn-outline-primary" id="btn-manual">Masukkan Koordinat Manual</button>
+            </div>
         </div>
 
-        <div class="ms-auto">
-          <button id="btn-analyze" class="btn btn-success">Lihat Analisa</button>
+        <div id="map" class="mt-3"></div>
+
+        <div class="controls">
+            <div>
+                <small class="text-muted">Koordinat terpilih:</small>
+                <div id="coord-display">Belum ada</div>
+            </div>
+
+            <div class="ms-auto">
+                <button id="btn-analyze" class="btn btn-success">Lihat Analisa</button>
+            </div>
         </div>
-      </div>
 
       <!-- form input manual -->
       <div class="coord-form" id="coord-form">
@@ -464,14 +473,14 @@
     <!-- Footer -->
     <footer class="bg-dark text-light py-4">
         <div class="container text-center">
-            <h5 class="mb-3">GeoFarm Project</h5>
+            <h5 class="mb-3" style="font-weight: bold;">GeoFarm Project</h5>
             <p>Ikuti kami di sosial media:</p>
             <div class="d-flex justify-content-center gap-3 mb-3">
                 <a href="#" class="text-light"><i class="bi bi-facebook"></i> Facebook</a>
                 <a href="#" class="text-light"><i class="bi bi-instagram"></i> Instagram</a>
                 <a href="#" class="text-light"><i class="bi bi-twitter-x"></i> Twitter</a>
             </div>
-            <small>&copy; 2025 GeoFarm Project. All Rights Reserved.</small>
+            <small>&copy; 2026 GeoFarm Project. All Rights Reserved.</small>
         </div>
     </footer>
 </body>
@@ -513,7 +522,7 @@
 
     document.getElementById('btn-pin').addEventListener('click', () => {
       pinMode = !pinMode;
-      document.getElementById('btn-pin').textContent = pinMode ? 'Klik pada peta untuk memilih titik (aktif)' : 'Mode Pilih Titik (Pin)';
+      document.getElementById('btn-pin').textContent = pinMode ? 'Klik pada peta untuk memilih titik lokasi' : 'Mode Pilih Titik (Pin)';
       if(pinMode) {
         map.getContainer().style.cursor = 'crosshair';
       } else {
@@ -639,7 +648,7 @@
 <!-- Bootstrap JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
+    <!-- <script>
         function popupLogin(callback){
             $.get("/login-user", function(html){
                 $("body").append(html);
@@ -663,7 +672,7 @@
                 popupSignUp();
             });
         });
-    </script>
+    </script> -->
     <script>
         // Simple search functionality
         document.querySelector('.search-btn').addEventListener('click', function() {

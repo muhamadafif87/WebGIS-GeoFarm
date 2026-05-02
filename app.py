@@ -36,8 +36,8 @@ def analyze_feasibility(lon, lat):
         gdf_titik_utm = gdf_titik
 
     # hitung jarak dalam meter (jika CRS meter)
-    jarak_ke_sungai = gdf_sungai_utm.geometry.distance(gdf_titik_utm.geometry.iloc[0]).min()
-    jarak_ke_jalan = gdf_jalan_utm.geometry.distance(gdf_titik_utm.geometry.iloc[0]).min()
+    jarak_ke_sungai = gdf_sungai_utm.geometry.distance(gdf_titik_utm.geometry).min()
+    jarak_ke_jalan = gdf_jalan_utm.geometry.distance(gdf_titik_utm.geometry).min()
     
     is_aman_sungai = jarak_ke_sungai >= JARAK_SUNGAI
     is_aman_jalan = jarak_ke_jalan >= JARAK_JALAN
